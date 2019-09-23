@@ -18,17 +18,30 @@ const data = [
 
 const svg = d3.select('svg');
 
-const rect = svg.selectAll('rect')
+const rects = svg.selectAll('rect')
   .data(data)
-  .attr('width', (d)=>{
-    return d.width;
-  })
+  
+  
+rects.attr('width', (d)=>{
+  return d.width;
+})
   .attr('height', (d)=>{
     return d.height;
   })
   .attr('fill', (d)=>{
     return d.fill;
-  });
+  });// these attributes are updated for elements that are already in the DOM
 
+rects.enter()
+  .append('rect')
+  .attr('width', (d) => {
+    return d.width;
+  })
+  .attr('height', (d) => {
+    return d.height;
+  })
+  .attr('fill', (d) => {
+    return d.fill;
+  });//these are updated for elements that have yet to ENTER the DOM
 
 
