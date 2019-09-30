@@ -57,6 +57,9 @@ xAxisGroup.selectAll('text')
   .attr('text-anchor', 'end')
   .attr('fill', 'blue');
 
+//transition
+const trans = d3.transition().duration(1000);
+
 //update cycle for d3
 const update = (data) => {
   //1. update scales (domains) if they rely on our data
@@ -71,19 +74,25 @@ const update = (data) => {
 
   //4. update current shapes in dom
   rects.attr('width', x.bandwidth)
-    .attr('height', d => graphHeight - y(d.orders))
     .attr('fill', 'orange')
     .attr('x', d => x(d.name))
-    .attr('y', d => y(d.orders));
+    // .transition(trans)
+    //   .attr('height', d => graphHeight - y(d.orders))//ending position
+    //   .attr('y', d => y(d.orders));
 
   //5. append enter selection to dom
   rects.enter()
     .append('rect')
-    .attr('width', x.bandwidth)
-    .attr('height', d => graphHeight - y(d.orders))
+    .attr('width', 0)//not necessary as it's defined in the widthTween
+    .attr('height', 0)
     .attr('fill', 'orange')
     .attr('x', d => x(d.name))
-    .attr('y', d => y(d.orders));
+    .attr('y', graphHeight)
+    .merge(rects)//this applies to both groups not just the enter groups
+      .transition(trans)
+        .attrTween('width', widthTween)
+        .attr('y', d => y(d.orders))
+        .attr('height', d => graphHeight - y(d.orders));
 
   // call axis
   xAxisGroup.call(xAxis);
@@ -115,4 +124,13 @@ db.collection('dishes').onSnapshot(res =>{
   });
 
   update(data);
-})
+});
+
+const widthTween = (d)=>{
+  let interPol = d3.interpolate(0, x.bandwidth());
+  //return a function which takes in a time ticker 't'
+  return function(t){
+    //return value from passing ticker into interPol
+    return interPol(t);
+  }
+}
