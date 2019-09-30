@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="canvas">
+
+  </div>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/6.6.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.6.2/firebase-firestore.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyBByQxsj4GmOGyoxsQAGR115bBVnZ0L1BU",
+      authDomain: "d3-playground-4683f.firebaseapp.com",
+      databaseURL: "https://d3-playground-4683f.firebaseio.com",
+      projectId: "d3-playground-4683f",
+      storageBucket: "d3-playground-4683f.appspot.com",
+      messagingSenderId: "688993093266",
+      appId: "1:688993093266:web:42467a0edd184d723c084b",
+      measurementId: "G-4LK83PWCHQ"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.firestore();//initialize db
+   
+  </script>
+
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <script src="./index.js"></script>
+</body>
+
+</html>
