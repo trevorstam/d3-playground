@@ -54,7 +54,9 @@ const update = (data) =>{
     .remove();
 
   //handle current DOM path updates, so pie chart becomes full circle and start end angles are re-calculated
-  paths.attr('d', arcPath);
+  paths.attr('d', arcPath)
+    .transition().duration(750)
+      .attrTween('d', arcTweenUpdate);
 
   
   paths.enter()
@@ -64,6 +66,7 @@ const update = (data) =>{
       .attr('stroke', '#fff')
       .attr('stroke-width', 3)
       .attr('fill', d => colour(d.data.name))
+      .each(function(d){ this._current = d })
       .transition().duration(750)
         .attrTween('d', arcTweenEnter);
 }
@@ -112,3 +115,15 @@ const arcTweenExit = (d) => {
     return arcPath(d);
   }
 };
+
+// use function keyword to allow THIS to reference current element
+function arcTweenUpdate(d){
+  //interpolate between two object
+  var interpUpdate = d3.interpolate(this._current, d);
+  //update current prop with new updated data
+  this._current = interpUpdate(1);
+
+  return function(ticker){
+    return arcPath(interpUpdate(ticker));
+  }
+}
