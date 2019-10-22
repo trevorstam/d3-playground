@@ -48,7 +48,10 @@ const update = (data) =>{
     .data(pie(data));
 
   // exit selection -> when user deletes data, elements need to be removed from the DOM
-  paths.exit().remove();
+  paths.exit()
+    .transition().duration(750)
+    .attrTween('d', arcTweenExit)
+    .remove();
 
   //handle current DOM path updates, so pie chart becomes full circle and start end angles are re-calculated
   paths.attr('d', arcPath);
@@ -99,4 +102,13 @@ const arcTweenEnter = (d) =>{
     d.startAngle = interp(ticker);
     return arcPath(d);
   }
-}
+};
+
+const arcTweenExit = (d) => {
+  interp = d3.interpolate(d.startAngle, d.endAngle);
+
+  return function (ticker) {
+    d.startAngle = interp(ticker);
+    return arcPath(d);
+  }
+};
