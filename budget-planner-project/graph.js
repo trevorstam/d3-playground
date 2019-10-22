@@ -33,11 +33,55 @@ const pie = d3.pie()
 
 const arcPath = d3.arc()
   .outerRadius(dims.radius)
-  .innerRadius(dims.radius/2)
+  .innerRadius(dims.radius/2);
+
+const colour = d3.scaleOrdinal(d3['schemeSet3']);
+
+//legend group setup
+const legendGroup = svg.append('g')
+  .attr('transform', `translate(${dims.width + 40}, 10)`);
+
+  const legend = d3.legendColor()
+    .shape('circle')
+    .shapePadding(10)
+    .scale(colour);
 
   // update function
 const update = (data) =>{
-  console.log(data);
+
+  //update colour scale domain
+  colour.domain(data.map(d => d.name));
+
+  //update and call legend
+  legendGroup.call(legend);
+  legendGroup.selectAll('text').attr('fill', 'white');
+
+  // join enhanced pie data to path elements
+  const paths = graph.selectAll('path')
+    .data(pie(data));
+
+  // exit selection -> when user deletes data, elements need to be removed from the DOM
+  paths.exit()
+    .transition().duration(750)
+    .attrTween('d', arcTweenExit)
+    .remove();
+
+  //handle current DOM path updates, so pie chart becomes full circle and start end angles are re-calculated
+  paths.attr('d', arcPath)
+    .transition().duration(750)
+      .attrTween('d', arcTweenUpdate);
+
+  
+  paths.enter()
+    .append('path')
+      .attr('class', 'arc')
+      // .attr('d', arcPath)//this is a reference to arcpath and this passes the data into the arcPath function
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 3)
+      .attr('fill', d => colour(d.data.name))
+      .each(function(d){ this._current = d })
+      .transition().duration(750)
+        .attrTween('d', arcTweenEnter);
 }
 
   //data array and firestore
@@ -65,4 +109,34 @@ db.collection('expenses').onSnapshot(res =>{
   });
 
   update(data);
-})
+});
+
+const arcTweenEnter = (d) =>{
+  var interp = d3.interpolate(d.endAngle, d.startAngle);
+
+  return function(ticker){
+    d.startAngle = interp(ticker);
+    return arcPath(d);
+  }
+};
+
+const arcTweenExit = (d) => {
+  interp = d3.interpolate(d.startAngle, d.endAngle);
+
+  return function (ticker) {
+    d.startAngle = interp(ticker);
+    return arcPath(d);
+  }
+};
+
+// use function keyword to allow THIS to reference current element
+function arcTweenUpdate(d){
+  //interpolate between two object
+  var interpUpdate = d3.interpolate(this._current, d);
+  //update current prop with new updated data
+  this._current = interpUpdate(1);
+
+  return function(ticker){
+    return arcPath(interpUpdate(ticker));
+  }
+}
