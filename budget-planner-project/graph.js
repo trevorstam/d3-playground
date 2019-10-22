@@ -57,10 +57,12 @@ const update = (data) =>{
   paths.enter()
     .append('path')
       .attr('class', 'arc')
-      .attr('d', arcPath)//this is a reference to arcpath and this passes the data into the arcPath function
+      // .attr('d', arcPath)//this is a reference to arcpath and this passes the data into the arcPath function
       .attr('stroke', '#fff')
       .attr('stroke-width', 3)
-      .attr('fill', d => colour(d.data.name));
+      .attr('fill', d => colour(d.data.name))
+      .transition().duration(750)
+        .attrTween('d', arcTweenEnter);
 }
 
   //data array and firestore
@@ -88,4 +90,13 @@ db.collection('expenses').onSnapshot(res =>{
   });
 
   update(data);
-})
+});
+
+const arcTweenEnter = (d) =>{
+  var interp = d3.interpolate(d.endAngle, d.startAngle);
+
+  return function(ticker){
+    d.startAngle = interp(ticker);
+    return arcPath(d);
+  }
+}
