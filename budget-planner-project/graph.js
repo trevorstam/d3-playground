@@ -33,11 +33,34 @@ const pie = d3.pie()
 
 const arcPath = d3.arc()
   .outerRadius(dims.radius)
-  .innerRadius(dims.radius/2)
+  .innerRadius(dims.radius/2);
+
+const colour = d3.scaleOrdinal(d3['schemeSet3'])
 
   // update function
 const update = (data) =>{
-  console.log(data);
+
+  //update colour scale domain
+  colour.domain(data.map(d => d.name));
+
+  // join enhanced pie data to path elements
+  const paths = graph.selectAll('path')
+    .data(pie(data));
+
+  // exit selection -> when user deletes data, elements need to be removed from the DOM
+  paths.exit().remove();
+
+  //handle current DOM path updates, so pie chart becomes full circle and start end angles are re-calculated
+  paths.attr('d', arcPath);
+
+  
+  paths.enter()
+    .append('path')
+      .attr('class', 'arc')
+      .attr('d', arcPath)//this is a reference to arcpath and this passes the data into the arcPath function
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 3)
+      .attr('fill', d => colour(d.data.name));
 }
 
   //data array and firestore
