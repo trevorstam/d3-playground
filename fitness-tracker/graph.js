@@ -28,19 +28,26 @@ const xAxisGroup = graph.append('g')
 
 const update = (data) =>{
   //set scale domains
-  x.domain(d3.extent(data, d => new Date(d.Date)));
+  x.domain(d3.extent(data, d => new Date(d.date)));
   y.domain([0, d3.max(data, d => d.distance)]);
 
   //create axes
   const xAxis = d3.axisBottom(x)
-    .ticks(4);
+    .ticks(4)
+    .tickFormat(d3.timeFormat('%b %d'));
   
   const yAxis = d3.axisLeft(y)
-    .ticks(4);
+    .ticks(4)
+    .tickFormat(d => d + ' m');
 
   //call axes
   xAxisGroup.call(xAxis);
   yAxisGroup.call(yAxis);
+
+  //rotate axis text
+  xAxisGroup.selectAll('text')
+    .attr('transform', `rotate(-40)`)
+    .attr('text-anchor', 'end');
 }
 
 //data and firestore
