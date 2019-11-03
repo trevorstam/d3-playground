@@ -19,6 +19,9 @@ btns.forEach(btn =>{
     input.setAttribute('id', activity);
     //set text of form span
     formActive.textContent = activity;
+
+    // call update function
+    update(data);
   })
 });
 
