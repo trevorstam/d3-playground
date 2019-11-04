@@ -49,4 +49,29 @@ const pack = d3.pack()
   .size([960, 700])// don't forget to store in array!!!
   .padding(5);
 
-const bubbleData =pack(rootNode).descendants();//descendants method turns it into an array  
+const bubbleData =pack(rootNode).descendants();//descendants method turns it into an array to join it to d3 shapes 
+
+
+//create ordinal scale
+const colour = d3.scaleOrdinal(['#d1c4e9', '#b39ddb', '#9575cd'])
+
+//join data and add group for each node
+const nodes = graph.selectAll('g')
+  .data(bubbleData)
+  .enter()
+  .append('g')
+  .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+nodes.append('circle')
+  .attr('r', d => d.r)
+  .attr('stroke', 'white')
+  .attr('stroke-width', 2)
+  .attr('fill', d =>colour(d.depth));
+
+nodes.filter(d => !d.children)
+  .append('text')
+  .attr('text-anchor', 'middle')
+  .attr('dy', '0.3em')//this is an offset in y direction
+  .attr('fill', 'white')
+  .style('font-size', d => d.value * 5)//the larger the value the larger the fontsize
+  .text(d => d.data.name);
